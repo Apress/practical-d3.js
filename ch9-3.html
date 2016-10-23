@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>Nesting</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+    <h1>Nesting</h1>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+  var url = "http://index.okfn.org/api/places.json" 
+
+
+  var draw = function(nested_data){
+
+    console.log('nested_data');
+    console.log( nested_data );
+
+    
+    var pack = d3.layout.treemap()
+                 .size(200, 200)
+                 .value(function(d){
+                    return parseInt(d.score, 10);
+                 });
+
+    var packed_data = pack(nested_data);
+    console.log('packed_data');
+    console.log( packed_data );
+
+  }  
+
+  d3.json(url, function(error, json) {
+    if (error) return console.warn(error);  
+    var nested_data = d3.nest()
+                        .key(function(d){
+                          return d.region.toLowerCase();
+                        })
+                        .rollup(function(leaves){
+                          return {
+                            name: leaves[0].region.toLowerCase(),
+                            children: leaves,
+                            value: d3.sum(leaves, function(d){ return parseInt(d.score, 10);  })
+                          }
+                        })
+                        .map(json);
+    console.log('nested_data');
+    console.log( nested_data );
+    draw({name: "GoDi", children: Object.keys(nested_data).map(function(v) { return nested_data[v]; }) });
+
+  });
+
+
+
+  </script>
+<html> 

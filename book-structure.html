@@ -1,0 +1,169 @@
+<html>
+  <head>
+    <title>My First SVG Path using D3</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <style>
+  </style>
+  <body>
+
+  </body>
+    <br/>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var book = { 
+   'name': 'Practical D3'  , 'children': [
+      {'name': 'Data', 'children': [
+        {'name': 'Visualization', 'children': [
+          {'name': 'Ch.1', 'author': 'Rayna', 'value': 20},
+          {'name': 'Ch.3', 'author': 'Rayna', 'value': 20},
+        ]},
+        {'name': 'Journalism', 'children': [
+          {'name': 'Ch.2', 'author': 'Rayna', 'value': 20},
+          
+        ]},
+        {'name': 'Wrangling', 'children': [
+          {'name': 'Ch.4', 'author': 'Rayna', 'value': 20},
+          {'name': 'Ch.9', 'author': 'Tarek', 'value': 20},
+        ]},
+      ]},
+      {'name': 'D3', 'children': [
+        {'name': 'Shapes', 'children': [
+          {'name': 'Ch.5', 'author': 'Tarek', 'value': 20},
+        ]},
+        {'name': 'Paths', 'children': [
+          {'name': 'Ch.6', 'author': 'Tarek', 'value': 20},
+        ]},
+        {'name': 'Layouts', 'children': [
+          {'name': 'Ch.7', 'author': 'Tarek', 'value': 20},
+          {'name': 'Ch.8', 'author': 'Tarek', 'value': 20},
+        ]},
+      ]},
+      
+    ]
+};
+
+
+
+var w = 600, h = 400, margin = 40;
+var svg = d3.select('body').append('svg')
+            .attr('width', w)
+            .attr('height', h);
+
+var colours = d3.scale.category10();
+
+var tree = d3.layout.tree()
+             .separation(function (a, b){
+                  if(a.depth == 2 && b.depth == 2 ){
+                    return 10;
+                  } if(a.depth == 3 && b.depth == 3 ){
+                    return 12;
+                  } else {
+                    return 1;
+                  }
+              }); 
+
+var diagonal =  d3.svg.diagonal();
+
+var nodes = tree.nodes(book).reverse();
+var links = tree.links(nodes);
+
+var xScale = d3.scale.linear().domain([0, 1]).range([margin, w-margin]);
+var yScale = d3.scale.linear().domain([0, 1]).range([margin, h-margin]);
+
+nodes = nodes.map(function(n){ 
+  n.x = xScale(n.x); 
+  n.y = yScale(n.y);
+  return n 
+});
+
+one_more_link = {
+  'source': null, 'target': null
+}
+nodes.forEach(function(node){
+  if (node.name == 'D3'){
+    one_more_link.source = node;
+  }
+  if (node.name == 'Wrangling'){
+    one_more_link.target = node;
+  }  
+});
+links.push(one_more_link);
+
+svg.selectAll("path")
+   .data(links)
+   .enter()
+   .append("path") 
+   .attr("d", diagonal)
+   .attr("stroke", function(d,i){ return colours(1); })
+   .attr("stroke-width", 4)
+   .attr("fill", "none");
+
+
+svg.selectAll("circle")
+   .data(nodes)
+   .enter()
+   .append("circle") 
+   .attr("cx", function(d,i){ return d.x; }) 
+   .attr("cy", function(d,i){ return d.y+4; }) 
+   .attr("r", function(d,i){
+      switch(d.depth){
+      case 0:
+          return 30;
+      case 1:
+          return 40;
+      case 2:
+          return 16;
+      default:
+          return 26;
+      }
+    })
+   .style("fill", '#FFF')
+   .style("stroke", function(d,i){
+      switch(d.depth){
+      case 0:
+          return '#FFF';
+      case 1:
+          return '#000';
+      case 2:
+          return '#FFF';
+      default:
+          return '#000';
+      }
+    })
+   .attr("stroke-width", 3);
+
+svg.selectAll("text")
+   .data(nodes)
+   .enter()
+   .append("text") 
+   .attr("x", function(d,i){ return d.x; }) 
+   .attr("y", function(d,i){ return d.y + 10; }) 
+   .text(function(d,i){ 
+      return d.name;  
+    }) 
+   .style("text-anchor", "middle")
+   .attr("font-size", function(d,i){
+      switch(d.depth){
+      case 0:
+          return 35;
+      case 1:
+          return 30;
+      case 2:
+          return 15;
+      default:
+          return 16;
+      }
+    })
+   .style("fill", function(d,i){ 
+      return '#000'; //colours(d.parent.name); 
+    });
+
+
+
+
+
+  </script>
+<html> 

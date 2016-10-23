@@ -1,0 +1,81 @@
+<html>
+  <head>
+    <title>May the force be with you</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var coloured_balls_data = [
+  {'colour': '#000044'},
+  {'colour': '#004444'},
+  {'colour': '#444444'},
+  {'colour': '#444488'},
+  {'colour': '#448888'},
+  {'colour': '#888888'},
+  {'colour': '#8888CC'},
+  {'colour': '#88CCCC'},
+  {'colour': '#CCCCCC'},
+];
+
+var w= 450, h = 350;
+
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w)
+    .attr('height', h);
+
+
+var force = d3.layout.force()
+    .size([w, h])
+    .friction(0.95)
+    .charge(-850)
+    .gravity(0.25);
+
+force.nodes(coloured_balls_data);
+
+
+var nodes = svg.selectAll('circle')
+    .data(coloured_balls_data)
+    .enter()
+    .append('circle')
+    .style('fill', function(d,i){ 
+      return d.colour; 
+    })
+    .style("opacity", 0.45);   ;
+
+force.on('tick', function() {
+     nodes.attr('cx', function(d) { 
+            return d.x; 
+          })
+          .attr('cy', function(d) { 
+            return d.y; 
+          })
+          .attr('r', '40');
+          
+});
+
+
+force.start();
+
+svg.append("text")
+   .attr("x", function(d, i){ 
+      return w/2;  
+    })
+   .attr("y", function(d, i){ 
+      return h/2; 
+    })
+   .text("Charge = 30, Gravity = 0")
+   .style("text-anchor", "middle")
+   .attr("font-size", "22")
+   .style("fill", "#333")
+   .style("opacity", 0.95);
+
+
+
+  </script>
+<html> 

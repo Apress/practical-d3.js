@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <title>Means of Transportation</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <style>
+  </style>
+  <body>
+
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var w= 400, h = 350;
+
+
+var transportation = [
+    { 'mean': 'Car'  , 'value': 40 },
+    { 'mean': 'Tram' , 'value': 10 },
+    { 'mean': 'Bus'  , 'value': 20 },
+    { 'mean': 'Walk' , 'value': 30 }
+];
+
+//var pieScale = d3.scale.linear()
+//                 .domain([0, 100])
+//                 .range([0, 2 * Math.PI]);
+
+var colours = d3.scale.category10(); 
+
+var svg = d3.select('body').append('svg')
+    .attr('width', w)
+    .attr('height', h);
+
+var pie = d3.layout.pie()
+            .startAngle(-0.5*Math.PI)
+            .endAngle(0.5*Math.PI)
+            .padAngle(0.04)
+            .sort(null)
+            .value(function(d){ 
+              return d.value; 
+            });
+
+var arc = d3.svg.arc() 
+            .innerRadius(40) 
+            // You can even use variable radii, example:
+            //.innerRadius(function(d,i){ return 30 + 20 * i;})
+            .outerRadius(150)
+            // You can even use variable radii, example:
+            //.outerRadius(function(d,i){ return 120 + 20 * i;}) 
+            .startAngle(function(d){ 
+              console.log(d);
+              return d.startAngle; 
+             }) 
+            .endAngle(function(d){ 
+              console.log(d);
+              return d.endAngle; 
+             });
+
+svg.selectAll("path")
+   .data(pie(transportation))
+   .enter()
+   .append("path") 
+   .attr("d", arc) 
+   .attr("fill", function(d,i){
+      return colours(i);
+    })
+   .attr("transform", "translate("+w/2+","+h/2+")");
+
+/**
+var arc = d3.svg.arc() 
+            .innerRadius(30) 
+            .outerRadius(80) 
+            .startAngle(function(d){ return d['start']; }) 
+            .endAngle(function(d){ return d['end']; });
+
+svg.selectAll("path")
+   .data([
+      {'start': 0, 'end': Math.PI}, 
+      {'start': Math.PI, 'end': 2*Math.PI}
+    ])
+   .enter()
+   .append("path")
+   .attr("d", arc) 
+   .attr("fill", function(d,i){
+      return colours(i);
+    })
+   .attr("stroke", "#FFFFFF")
+   .attr("stroke-width", "3px");
+   .attr("transform", "translate(" + w/2 + "," + h/2 + ")");
+*/
+
+  </script>
+<html> 

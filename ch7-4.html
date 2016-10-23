@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <title>My own layout, Bitterballen</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+    <div id="drawing_div" style="height: 300;"></div>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+  data = [30, 25, 20, 30, 10, 20, 30];
+
+
+  var drawing_div = d3.select('#drawing_div');
+  var w = parseInt(drawing_div.style('width'));
+  var h = parseInt(drawing_div.style('height'));
+
+  var colours = d3.scale.category10();
+
+  var drawing_svg = drawing_div.append('svg')
+    .style("background", "#F0F0F0")
+    .attr('width', w)
+    .attr('height', h);
+
+  var myLayout = {};
+  myLayout.bitterballen = function(){
+
+    var w = 1;
+    var h = 1;
+    var total = 0;
+
+    ballen = function(data){
+      total = data.reduce(function(a,b){return a+b});
+      _temp_sum = 0;
+      return data.map(function(v,i,a){
+        //console.log("v:" + v + " i:" + i + " a:" + a);
+        //console.log(a.slice(0,i));
+        if (i == 0){
+          x = v;
+        } else {  
+          x = (v + 2 * a.slice(0,i).reduce(function(a,b){return a+b}));
+        }
+        //console.log("x:" + x + " total:" + total + " w:" + w);
+        return {
+          'x': w * x/(2*total),
+          'y': h * 1/2,
+          'r': w * v/(2*total)
+        }; 
+      })
+    }
+
+    ballen.size = function(width, height){
+      if (!arguments.length){
+       return [w, h];
+      }
+      w = width;
+      h = height; 
+      return ballen;
+    }  
+
+    return ballen;
+  }
+  
+
+  ballen = myLayout.bitterballen()
+  ballen.size(w,h);
+  drawing_svg.selectAll('circle')
+             .data(ballen(data))
+             .enter()
+             .append('circle')
+             .attr("cx", function(d,i){ return d.x; }) 
+             .attr("cy", function(d,i){ return d.y; }) 
+             .attr("r", function(d,i){ return d.r; }) 
+             .attr("fill", function(d,i){ return colours(i); })
+             .attr("stroke", "#FFF")
+             .attr("stroke-width", 2);
+
+  console.log(ballen(data));
+
+  </script>
+<html> 

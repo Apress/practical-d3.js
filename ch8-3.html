@@ -1,0 +1,133 @@
+<html>
+  <head>
+    <title>Plugins used by news websites</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+/** 
+
+// used Ghostery to get this data
+// this is the jQuery code I inserted in Ghostery console 
+
+(function(){
+  
+  var addons = [];
+  $('.app-div .app-info-container .app-text .app-name')
+    .each(function(){ 
+      addons.push( $(this).html() ) 
+    });
+  return addons;
+})();
+
+'theguardian.com': ["AppNexus", "DoubleClick", "eXelate", "Google Adsense", "Google AdWords Conversion", "Google Dynamic Remarketing", "Krux Digital", "LiveRamp", "NetRatings SiteCensus", "Rubicon", "ScoreCard Research Beacon", "VisualDNA"]
+
+'nytimes.com': ["[x+1]", "AppNexus", "BidSwitch", "BrightRoll", "ChartBeat", "ClickTale", "DataXu", "DoubleClick", "DoubleClick Floodlight", "Dynamic Yield", "Ensighten", "Facebook Connect", "Facebook Custom Audience", "Google Adsense", "Google Analytics", "Index Exchange (Formerly Casale Media)", "LiveRail", "Moat", "NetRatings SiteCensus", "New Relic", "OpenX", "Optimizely", "PubMatic", "Quantcast", "Rocket Fuel", "Rubicon", "ScoreCard Research Beacon", "Tapad", "Twitter Advertising", "WebTrends"]
+
+'bbc.com': ["BidSwitch", "ChartBeat", "DoubleClick", "Effective Measure", "Flashtalking", "Ghostery Privacy Notice", "Google Adsense", "Google Analytics", "iPerceptions", "Krux Digital", "Rubicon", "ScoreCard Research Beacon", "Yieldr"]
+
+'dw.com': ["AT Internet", "Disqus", "Facebook Connect", "ScoreCard Research Beacon", "Twitter Button"]
+
+'zeit.de': ["Adition", "DoubleClick", "DoubleClick Spotlight", "Google Adsense", "Google AdWords Conversion", "Google Analytics", "Google Dynamic Remarketing", "Google Tag Manager", "INFOnline", "Integral Ad Science", "Meetrics", "Nugg.Ad", "Semasio", "The ADEX", "Webtrekk", "xplosion", "Yieldlab"]
+
+'volkskrant.nl': ["AppNexus", "ChartBeat", "Datalogix", "DoubleClick", "DoubleClick Bid Manager", "eXelate", "Ghostery Privacy Notice", "Google Adsense", "Google Analytics", "Google Tag Manager", "Krux Digital", "Rubicon", "Usabilla", "VisualDNA", "Weborama", "Yieldr"]
+
+'starbucks.com': ["Advertising.com", "AppNexus", "BidSwitch", "BrightRoll", "DoubleClick", "DoubleClick Floodlight", "Facebook Connect", "Facebook Custom Audience", "Google AdWords Conversion", "Google Analytics", "Google Dynamic Remarketing", "Google Tag Manager", "Index Exchange (Formerly Casale Media)", "KissInsights", "LiveRail", "OpenX", "Optimizely", "PubMatic", "Right Media", "Rocket Fuel", "Rubicon", "Smaato", "Sonobi", "SpotXchange", "Tapad"]
+
+'costa.co.uk': ["DoubleClick", "Facebook Connect", "Facebook Social Plugins", "Google Analytics", "Google Tag Manager", "ShareThis", "Twitter Button", "Typekit by Adobe"]
+
+*/
+
+var nodes = [{'type': 'newspaper', 'name': 'Zeit'}, {'type': 'newspaper', 'name': 'BBC'}, {'type': 'newspaper', 'name': 'The Guardian'}, {'type': 'newspaper', 'name': 'Volkskrant'}, {'type': 'newspaper', 'name': 'NYTimes'}, {'type': 'plugin', 'name': 'Flashtalking'}, {'type': 'plugin', 'name': 'Integral Ad Science'}, {'type': 'plugin', 'name': 'xplosion'}, {'type': 'plugin', 'name': 'Rocket Fuel'}, {'type': 'plugin', 'name': 'BrightRoll'}, {'type': 'plugin', 'name': 'New Relic'}, {'type': 'plugin', 'name': 'Rubicon'}, {'type': 'plugin', 'name': 'Quantcast'}, {'type': 'plugin', 'name': 'VisualDNA'}, {'type': 'plugin', 'name': '[x+1]'}, {'type': 'plugin', 'name': 'Dynamic Yield'}, {'type': 'plugin', 'name': 'Google AdWords Conversion'}, {'type': 'plugin', 'name': 'DoubleClick Floodlight'}, {'type': 'plugin', 'name': 'DataXu'}, {'type': 'plugin', 'name': 'Usabilla'}, {'type': 'plugin', 'name': 'Meetrics'}, {'type': 'plugin', 'name': 'Facebook Custom Audience'}, {'type': 'plugin', 'name': 'Optimizely'}, {'type': 'plugin', 'name': 'Twitter Advertising'}, {'type': 'plugin', 'name': 'eXelate'}, {'type': 'plugin', 'name': 'OpenX'}, {'type': 'plugin', 'name': 'DoubleClick'}, {'type': 'plugin', 'name': 'Yieldlab'}, {'type': 'plugin', 'name': 'Ensighten'}, {'type': 'plugin', 'name': 'Google Adsense'}, {'type': 'plugin', 'name': 'ChartBeat'}, {'type': 'plugin', 'name': 'iPerceptions'}, {'type': 'plugin', 'name': 'BidSwitch'}, {'type': 'plugin', 'name': 'Datalogix'}, {'type': 'plugin', 'name': 'Google Dynamic Remarketing'}, {'type': 'plugin', 'name': 'Effective Measure'}, {'type': 'plugin', 'name': 'DoubleClick Bid Manager'}, {'type': 'plugin', 'name': 'The ADEX'}, {'type': 'plugin', 'name': 'LiveRamp'}, {'type': 'plugin', 'name': 'ScoreCard Research Beacon'}, {'type': 'plugin', 'name': 'Google Tag Manager'}, {'type': 'plugin', 'name': 'Moat'}, {'type': 'plugin', 'name': 'Yieldr'}, {'type': 'plugin', 'name': 'Facebook Connect'}, {'type': 'plugin', 'name': 'Index Exchange (Formerly Casale Media)'}, {'type': 'plugin', 'name': 'Tapad'}, {'type': 'plugin', 'name': 'AppNexus'}, {'type': 'plugin', 'name': 'Weborama'}, {'type': 'plugin', 'name': 'Semasio'}, {'type': 'plugin', 'name': 'LiveRail'}, {'type': 'plugin', 'name': 'WebTrends'}, {'type': 'plugin', 'name': 'Ghostery Privacy Notice'}, {'type': 'plugin', 'name': 'INFOnline'}, {'type': 'plugin', 'name': 'PubMatic'}, {'type': 'plugin', 'name': 'Krux Digital'}, {'type': 'plugin', 'name': 'Google Analytics'}, {'type': 'plugin', 'name': 'Webtrekk'}, {'type': 'plugin', 'name': 'Adition'}, {'type': 'plugin', 'name': 'NetRatings SiteCensus'}, {'type': 'plugin', 'name': 'DoubleClick Spotlight'}, {'type': 'plugin', 'name': 'Nugg.Ad'}, {'type': 'plugin', 'name': 'ClickTale'}];
+
+var links = [{'source': 0, 'target': 6}, {'source': 0, 'target': 7}, {'source': 0, 'target': 16}, {'source': 0, 'target': 20}, {'source': 0, 'target': 26}, {'source': 0, 'target': 27}, {'source': 0, 'target': 29}, {'source': 0, 'target': 34}, {'source': 0, 'target': 37}, {'source': 0, 'target': 40}, {'source': 0, 'target': 48}, {'source': 0, 'target': 52}, {'source': 0, 'target': 55}, {'source': 0, 'target': 56}, {'source': 0, 'target': 57}, {'source': 0, 'target': 59}, {'source': 0, 'target': 60}, {'source': 1, 'target': 5}, {'source': 1, 'target': 11}, {'source': 1, 'target': 26}, {'source': 1, 'target': 29}, {'source': 1, 'target': 30}, {'source': 1, 'target': 31}, {'source': 1, 'target': 32}, {'source': 1, 'target': 35}, {'source': 1, 'target': 39}, {'source': 1, 'target': 42}, {'source': 1, 'target': 51}, {'source': 1, 'target': 54}, {'source': 1, 'target': 55}, {'source': 2, 'target': 11}, {'source': 2, 'target': 13}, {'source': 2, 'target': 16}, {'source': 2, 'target': 24}, {'source': 2, 'target': 26}, {'source': 2, 'target': 29}, {'source': 2, 'target': 34}, {'source': 2, 'target': 38}, {'source': 2, 'target': 39}, {'source': 2, 'target': 46}, {'source': 2, 'target': 54}, {'source': 2, 'target': 58}, {'source': 3, 'target': 11}, {'source': 3, 'target': 13}, {'source': 3, 'target': 19}, {'source': 3, 'target': 24}, {'source': 3, 'target': 26}, {'source': 3, 'target': 29}, {'source': 3, 'target': 30}, {'source': 3, 'target': 33}, {'source': 3, 'target': 36}, {'source': 3, 'target': 40}, {'source': 3, 'target': 42}, {'source': 3, 'target': 46}, {'source': 3, 'target': 47}, {'source': 3, 'target': 51}, {'source': 3, 'target': 54}, {'source': 3, 'target': 55}, {'source': 4, 'target': 8}, {'source': 4, 'target': 9}, {'source': 4, 'target': 10}, {'source': 4, 'target': 11}, {'source': 4, 'target': 12}, {'source': 4, 'target': 14}, {'source': 4, 'target': 15}, {'source': 4, 'target': 17}, {'source': 4, 'target': 18}, {'source': 4, 'target': 21}, {'source': 4, 'target': 22}, {'source': 4, 'target': 23}, {'source': 4, 'target': 25}, {'source': 4, 'target': 26}, {'source': 4, 'target': 28}, {'source': 4, 'target': 29}, {'source': 4, 'target': 30}, {'source': 4, 'target': 32}, {'source': 4, 'target': 39}, {'source': 4, 'target': 41}, {'source': 4, 'target': 43}, {'source': 4, 'target': 44}, {'source': 4, 'target': 45}, {'source': 4, 'target': 46}, {'source': 4, 'target': 49}, {'source': 4, 'target': 50}, {'source': 4, 'target': 53}, {'source': 4, 'target': 55}, {'source': 4, 'target': 58}, {'source': 4, 'target': 61}];
+
+var w= 500, h = 500;
+
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w)
+    .attr('height', h);
+
+//var colours = d3.scale.category10();
+
+var force = d3.layout.force()
+    .size([w, h])
+    .charge(function(d){
+      return -600;
+     })
+    .linkDistance(0.4*w)
+    .gravity(0);
+
+force.nodes(nodes);
+force.links(links);
+
+
+var gen = d3.svg.diagonal();
+
+var link = svg.selectAll("path")
+              .data(force.links())
+              .enter()
+              .append("path")
+              .attr("stroke", '#aec7e8')
+              .attr("stroke-width", "2px")
+              .attr("fill", "none")
+              .style("opacity", 0.35);
+
+var node = svg.selectAll('text')
+              .data(force.nodes())
+              .enter()
+              .append('text')
+              .text(function(d){ 
+                return d.name; 
+               })
+              .style("text-anchor", "middle")
+              .attr('font-size', function(d){
+                return (d.type == 'newspaper')? 28 : 14;
+               })
+              .style("fill", function(d,i){ 
+                return (d.type == 'newspaper')? '#1f77b4' : '#ff7f0e';
+               })
+              .style("opacity",function(d){
+                return (d.type == 'newspaper')? 0.99 : 0.60;
+               })
+              .call(force.drag);
+
+
+var focus = function(type){
+  return (type == 'newspaper')? {'x': 0.5*w ,'y': 0.4*h} : {'x': 0.5*w ,'y': 0.6*h};;
+}  
+
+force.on('tick', function(e) {
+
+    var k = 0.8 * e.alpha;
+
+    nodes.forEach(function(o, i) {
+      o.y += (focus(o.type).y - o.y) * k;
+      o.x += (focus(o.type).x - o.x) * k;
+    });
+
+    node.attr('x', function(d) { 
+            return d.x; 
+         })
+        .attr('y', function(d) { 
+            return d.y; 
+         });
+
+    link.attr("d", gen)
+          
+});
+
+
+force.start();
+
+
+
+
+  </script>
+<html> 

@@ -1,0 +1,114 @@
+<html>
+  <head>
+    <title>GDP for USA, China, Japan and Germany</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <style>
+    .node {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: 2px;
+    }
+
+    .link {
+        stroke: #777;
+        stroke-width: 2px;
+    }
+  </style>
+  <body>
+
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var w = 400,
+    h = 300;
+
+var colours = d3.scale.category20b();
+
+var svg = d3.select('body').append('svg')
+    .attr('width', w)
+    .attr('height', h);
+
+var gdp = [
+    { 
+      'country': 'Germany',
+      'colour': '#2ca02c',  
+      'value': 3 
+    },
+    { 
+      'country': 'Japan',
+      'colour': '#9467bd',  
+      'value': 5 
+    },
+    { 
+      'country': 'China',
+      'colour': '#d62728', 
+      'value': 9 
+    },
+    { 
+      'country': 'USA', 
+      'colour': '#1f77b4', 
+      'value': 17 
+    },
+];
+ 
+
+var max_gdp = d3.max(gdp, function(o){ return o.value});
+
+var angleScale = d3.scale
+                   .linear()
+                   .domain([0,max_gdp]) 
+                   .range([0, 1.5*Math.PI]); 
+
+var arc = d3.svg.arc() 
+            .innerRadius(function(d, i){
+              return (i+1)*25;
+             }) 
+            .outerRadius(function(d, i){
+              return (i+2)*25;
+             })
+            .startAngle(function(d){ 
+              return angleScale(0); 
+             }) 
+            .endAngle(function(d){ 
+              return angleScale(d.value); 
+             });
+
+var g = svg.append("g")
+
+g.selectAll("path")
+ .data(gdp)
+ .enter()
+ .append("path") 
+ .attr("d", arc) 
+ .attr("fill", function(d,i){
+    return d.colour;
+  })
+ .attr("stroke", "#FFF")
+ .attr("stroke-width", "1px")
+ //.attr("transform", "translate("+w/2+","+h/2+")");
+
+g.selectAll("text")
+ .data(gdp)
+ .enter()
+ .append("text") 
+ .text(function(d){ 
+    return d.country + " ($" +  d.value + " Trillion)"; 
+  }) 
+ .attr("x", function(d,i){
+    return -10;
+  })
+ .attr("y", function(d,i){
+    return -(i+1)*25;
+  })
+ .style("text-anchor", "end")
+ //.style("font-size", "19px")
+ //.attr("transform", "translate("+w/2+","+h/2+")");
+
+g.attr("transform", "translate("+w/2+","+h/2+")");
+
+  </script>
+<html> 

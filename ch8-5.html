@@ -1,0 +1,179 @@
+<html>
+  <head>
+    <title>Meatballs</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var cup_winners = [
+  {'country': 'Brazil', 'wins': 5, 'continent': 'Americas'},
+  {'country': 'Germany', 'wins': 4, 'continent': 'Europe'},
+  {'country': 'Italy', 'wins': 4, 'continent': 'Europe'},
+  {'country': 'Argentina', 'wins': 2, 'continent': 'Americas'},
+  {'country': 'Uruguay', 'wins': 2, 'continent': 'Americas'},
+  {'country': 'France', 'wins': 1, 'continent': 'Europe'},
+  {'country': 'England', 'wins': 1, 'continent': 'Europe'},
+  {'country': 'Spain', 'wins': 1, 'continent': 'Europe'},
+];
+
+var mylayout = {};
+mylayout.meatballs = function(){
+  
+  // object we will assign all methods to
+  var balls = {};
+  // default method for extracting values from array items
+  var value = function(d){ 
+    return d.value 
+  };
+  // like in d3, default size is 1x1 px
+  var size = [1,1];
+
+  balls.cook = function(data){
+    // calculate the sum of all array items
+    var sum = data.map(function(d, i){ 
+      return value(d); 
+    }).reduce(function(a,b){ 
+      return a+b; 
+    });
+    // offset each circle after all previous ones
+    var offset = 0;
+    // transform given data;
+    // add x, y and r to each item of it
+    // then retunr the transformed data back
+    return data.map(function(d, i) {
+      r = 0.5* value(d) * size[0] / sum;
+      d.r = r;
+      d.x = offset + r;
+      d.y = size[1]/2;
+      offset += 2 * r;
+      return d;
+    });
+  }
+
+  // layout size getter and setter
+  balls.size = function(x){
+    if (!arguments.length) return size;
+    size = x;
+    // for method chaining in case of setter
+    return balls;
+  }
+
+  // layout value extraction function getter and setter
+  balls.value = function(x){
+    if (!arguments.length) return value;
+    value = x;
+    // for method chaining in case of setter
+    return balls;
+  }
+
+  // return balls object
+  return balls;
+
+}  
+
+var w = 640, h = 420;
+
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w)
+    .attr('height', h);
+
+// Setting the meatballs layout
+// Since our data elements look like this
+//  {'country': 'Italy', 'wins': 4, .. }
+// We need to tell the layout to extract values from wins
+// We finally let the layout know the current width and height 
+var meatballs = mylayout.meatballs()
+    .value(function(d){
+        return d.wins;
+     })
+    .size([w, h]);
+
+// We then apply the layout on our data
+var transformed_data = meatballs.cook(cup_winners);
+
+// Use the transformed data to draw the circles
+var node = svg.selectAll('circle')
+              .data(transformed_data)
+              .enter()
+              .append('circle')
+              .attr('cx', function(d){
+                return d.x;
+               })
+              .attr('cy', function(d){
+                return d.y;
+               })
+              .attr('r', function(d){
+                return d.r;
+               })
+              .style("fill", function(d,i){ 
+                return (d.continent == 'Americas')? '#ff7f0e' : '#1f77b4';
+               })
+              .style("opacity", 0.55);
+
+
+node.on('mouseover', function(){
+  cup_winners = cup_winners.sort(function(a,b){
+    return a.continent > b.continent
+  });
+
+  node.data(meatballs.cook(cup_winners))
+      .transition()
+      .duration(600)
+      .attr('cx', function(d){
+        return d.x;
+       })
+      .attr('cy', function(d){
+        return d.y;
+       })
+      .attr('r', function(d){
+        return d.r;
+       })
+      .style("fill", function(d,i){ 
+        return (d.continent == 'Americas')? '#ff7f0e' : '#1f77b4';
+       })
+      .style("opacity", 0.55);
+
+})
+
+node.on('mouseout', function(){
+  cup_winners = cup_winners.sort(function(a,b){
+    return a.wins < b.wins
+  });
+
+  node.data(meatballs.cook(cup_winners))
+      .transition()
+      .duration(600)
+      .attr('cx', function(d){
+        return d.x;
+       })
+      .attr('cy', function(d){
+        return d.y;
+       })
+      .attr('r', function(d){
+        return d.r;
+       })
+      .style("fill", function(d,i){ 
+        return (d.continent == 'Americas')? '#ff7f0e' : '#1f77b4';
+       })
+      .style("opacity", 0.55);
+
+})
+
+
+
+var outer = function(x){
+  var sub_total = x;
+  var inner = function(y){
+    return sub_total + y;
+  }
+  return inner;
+}  
+
+  </script>
+<html> 

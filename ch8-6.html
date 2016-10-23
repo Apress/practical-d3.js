@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <title>Meatballs</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var cup_winners = [
+  {
+    'country': 'Brazil', 'wins': 5, 
+    'colours': ['#fdd835','#fdd835','#0d47a1','#fdd835']
+  },
+  {
+    'country': 'Germany', 'wins': 4, 
+    'colours': ['#eeeeee','#eeeeee', '#212121', '#eeeeee']
+  },
+  {
+    'country': 'Italy', 'wins': 4, 
+    'colours': ['#0d47a1', '#eeeeee', '#0d47a1', '#eeeeee']
+  },
+  {
+    'country': 'Argentina', 'wins': 2, 
+    'colours': ['#b3e5fc','#eeeeee','#212121','#eeeeee']
+  },
+  {
+    'country': 'Uruguay', 'wins': 2, 
+    'colours': ['#b3e5fc','#b3e5fc','#212121','#b3e5fc']
+  },
+  {
+    'country': 'England', 'wins': 1, 
+    'colours': ['#eeeeee','#eeeeee', '#212121', '#eeeeee']
+  },
+  {
+    'country': 'France', 'wins': 1, 
+    'colours': ['#0d47a1','#eeeeee','#e53935','#eeeeee']
+  },
+  {
+    'country': 'Spain', 'wins': 1, 
+    'colours': ['#e53935','#fdd835','#e53935','#fdd835']
+  },
+];
+
+
+d3.layout.meatballs = function(){
+  
+  var balls = {},
+      value = function(d){ return d.value }, 
+      size = [1,1];
+
+  balls.cook = function(data){
+    var sum = data.map(function(d, i){ 
+      return value(d); 
+    }).reduce(function(a,b){ 
+      return a+b; 
+    });
+    var offset = 0;
+    return data.map(function(d, i) {
+      r = 0.5* value(d) * size[0] / sum;
+      d.r = r;
+      d.x = offset + r;
+      d.y = size[1]/2;
+      offset += 2 * r;
+      return d;
+    });
+  }
+
+  balls.size = function(x){
+    if (!arguments.length) return size;
+    size = x;
+    return balls;
+  }
+
+
+  balls.value = function(x){
+    if (!arguments.length) return value;
+    value = x;
+    return balls;
+  }
+
+  return balls;
+
+}  
+
+var w = 820, h = 380;
+
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w)
+    .attr('height', h);
+
+var meatballs = d3.layout.meatballs()
+    .value(function(d){ return d.wins; })
+    .size([w, h]);
+
+
+var pie = d3.layout.pie()
+    // moving start angle a bit to the left 
+    .startAngle(-0.4*Math.PI)
+    // making sure we have a full circle still
+    .endAngle(1.6*Math.PI)
+    .sort(null);
+
+var arc = d3.svg.arc() 
+            .innerRadius(0.45) 
+            .outerRadius(0.95);
+
+meatballs.cook(cup_winners).forEach(function(d,i){
+  var cssclass = d.country;
+  var colours = d.colours
+  svg.selectAll(cssclass)
+     .data(pie([4,1,4,1]))
+     .enter()
+     .append('path')
+     .attr('class', cssclass) 
+     .attr("d", arc) 
+     .attr("fill", function(d,i){
+        return colours[i];
+      })
+     .attr("transform", "translate("+ d.x +","+ d.y +") scale(" + d.r + ")");
+
+});
+
+
+
+
+  </script>
+<html> 

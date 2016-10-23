@@ -1,0 +1,192 @@
+<html>
+  <head>
+    <title>Weekly site visits by Country</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var weekly_visits = [
+  {
+    "name": "Japan",
+    "values": [
+      { "x": 0, "y": 12},
+      { "x": 1, "y": 11},
+      { "x": 2, "y": 15},
+      { "x": 3, "y": 21},
+      { "x": 4, "y": 23},
+      { "x": 5, "y": 13},
+      { "x": 6, "y": 12} 
+    ],
+    "colour": "#FF0000"
+  },
+  {  
+    "name": "Italy",
+    "values": [
+      { "x": 0, "y": 12},
+      { "x": 1, "y": 19},
+      { "x": 2, "y": 16},
+      { "x": 3, "y": 32},
+      { "x": 4, "y": 41},
+      { "x": 5, "y": 18},
+      { "x": 6, "y": 12}, 
+    ],
+    "colour": "#00FF00"
+  },
+  {  
+    "name": "France",
+    "values": [
+      { "x": 0, "y": 32},
+      { "x": 1, "y": 22},
+      { "x": 2, "y": 33},
+      { "x": 3, "y": 33},
+      { "x": 4, "y": 11},
+      { "x": 5, "y": 10},
+      { "x": 6, "y": 32}, 
+    ],
+    "colour": "#0000FF"
+  },
+  {  
+    "name": "Spain",
+    "values": [
+      { "x": 0, "y": 12},
+      { "x": 1, "y": 19},
+      { "x": 2, "y": 16},
+      { "x": 3, "y": 32},
+      { "x": 4, "y": 41},
+      { "x": 5, "y": 18},
+      { "x": 6, "y": 12}, 
+    ],
+    "colour": "#FF0000"
+  },
+  {
+    "name": "Greece",
+    "values": [
+      { "x": 0, "y": 12},
+      { "x": 1, "y": 11},
+      { "x": 2, "y": 15},
+      { "x": 3, "y": 37},
+      { "x": 4, "y": 43},
+      { "x": 5, "y": 13},
+      { "x": 6, "y": 12} 
+    ],
+    "colour": "#FF0000"
+  },
+  {  
+    "name": "China",
+    "values": [
+      { "x": 0, "y": 32},
+      { "x": 1, "y": 22},
+      { "x": 2, "y": 33},
+      { "x": 3, "y": 33},
+      { "x": 4, "y": 11},
+      { "x": 5, "y": 10},
+      { "x": 6, "y": 32}, 
+    ],
+    "colour": "#0000FF"
+  },
+];
+
+
+
+var w= 690, h = 380;
+var h_margin = 20, v_margin = 55;
+
+
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w+2*h_margin)
+    .attr('height', h+2*v_margin);
+
+var colours = d3.scale.category20c();
+
+var stack = d3.layout.stack()
+              .offset('silhouette')
+              .values(function(d){ 
+                return d.values; 
+               });
+
+
+weekly_visits_stack = stack(weekly_visits);
+console.log(weekly_visits_stack);
+
+max_y = d3.max( 
+  weekly_visits_stack[weekly_visits_stack.length - 1]["values"],
+  function(d){ return d.y0 + d.y; }
+)
+
+x_range = weekly_visits_stack[0]["values"].filter(function(e,i,a){ 
+  return (i == 0 || i == (a.length - 1)) ? true : false ; 
+}).map(function(d){
+  return d["x"]
+});
+
+
+var a = d3.scale.linear()
+          .domain(x_range)
+          .range([-0.80*Math.PI, 0.80*Math.PI]);
+
+var r = d3.scale.linear()
+          .domain([0, max_y])
+          .range([0, 0.7*h]);
+          
+
+var area = d3.svg.area.radial()
+    .interpolate('cardinal')
+    .angle(function(d, i) { return a(d.x); })
+    .innerRadius(function(d) { return r(d.y0); })
+    .outerRadius(function(d) { return r(d.y0 + d.y); });
+
+svg.selectAll("path")
+      .data(weekly_visits_stack)
+      .enter()
+      .append("path")
+      .attr("d", function(d){ 
+        return area(d["values"]); 
+      })
+      .style("fill", function(d, i){
+        return colours(i); 
+      })
+      .attr("stroke", "#FFF")
+      .attr("stroke-width", 0)
+      .style("opacity", 0.70)
+      .on("mouseover", function(d) {      
+          d3.select(this).style("opacity", 0.95);    
+       })
+      .on("mouseout", function(d) {      
+          d3.select(this).style("opacity", 0.70);          
+       })
+      .attr("transform", "translate("+(0.5*w)+","+(0.8*h)+")");;
+
+
+var textScale = d3.scale.ordinal().domain(weekly_visits_stack.map(function(d,i){ return i; })).rangePoints([0.20*r(max_y), 0.60*r(max_y)]);
+
+svg.selectAll("text")
+      .data(weekly_visits_stack)
+      .enter()
+      .append("text")
+      .attr("x", function(d, i){ 
+        return w/2;  
+      })
+      .attr("y", function(d, i){ 
+        console.log(d.values);
+        return 0.83*h + textScale(i); 
+      })
+      .text(function(d){ 
+        return d["name"]; 
+      })
+      .style("text-anchor", "middle")
+      .attr("font-size", function(d,i){
+        return 22;  
+       })
+      .style("fill", function(d,i){
+        return colours(i);  
+       });
+
+
+  </script>
+<html> 

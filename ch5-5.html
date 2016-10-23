@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <title>Grouped Shapes</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+    <svg width="200" height="200" id="fun-drawing-area">
+    </svg>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      
+    var fda = d3.select("#fun-drawing-area");
+
+    var g = fda.append("g");
+
+    g.append("rect")
+     .attr("y", 0)
+     .attr("x", 0)
+     .attr("width", 40)
+     .attr("height", 40)
+     .style("fill", "blue");
+    
+    g.append("circle")
+     .attr("cx", 40)
+     .attr("cy", 40)
+     .attr("r", 20)
+     .style("fill", "red");
+
+    // Make everything 2 times bigger.
+    g.attr("transform", "translate(50, 50) scale(2)");
+
+    // Add label explaining what is going on here.
+    fda.append("text")
+       .attr("x", 10).attr("y", 20)
+       .text("translate(50, 50) scale(2)");
+
+    // Try moving things only
+    //g.attr("transform", "translate(50,50)");
+    //fda.append("text")
+    //   .attr("x", 10).attr("y", 20)
+    //   .text("translate(50,50)");
+
+    // Try moving things and rotating them as well
+    //g.attr("transform", "translate(70, 50) rotate(30)");
+    //fda.append("text")
+    //   .attr("x", 10).attr("y", 20)
+    //   .text("translate(70, 50) rotate(30)");
+    
+    
+
+    </script>
+  </body>
+<html> 
+

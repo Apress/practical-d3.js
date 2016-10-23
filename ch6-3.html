@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <title>Germany World Cup Goals</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+    <style>
+      .area {
+        fill: #7F00FF;
+        stroke: #BBB;
+      }
+    </style>
+  </head>
+  <body>
+  </body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+  germany_cup = [
+    {
+      'year': 1990, 'goals_for': 15, 'goals_against': 5, 'position': 1 
+    },
+    {
+      'year': 1994, 'goals_for': 9,'goals_against': 7, 'position': 5 
+    },
+    {
+      'year': 1998, 'goals_for': 8, 'goals_against': 6, 'position': 7 
+    },
+    {
+      'year': 2002, 'goals_for': 14, 'goals_against': 3, 'position': 2 
+    },
+    {
+      'year': 2006, 'goals_for': 14, 'goals_against': 6, 'position': 3 
+    },
+    {
+      'year': 2010, 'goals_for': 16, 'goals_against': 5, 'position': 3 
+    },
+    {
+      'year': 2014, 'goals_for': 18, 'goals_against': 4, 'position': 1 
+    }
+  ]; 
+  </script>
+
+  <script type="text/javascript">
+  
+  // Width and Height of our SVG area
+  w = 400; h = 300;
+
+  // Margin around our chart
+  margin = 20;
+
+  // Let the JavaScript append the SVG into the body this time. 
+  var svg_area = d3.select("body")
+                   .append("svg")
+                   .attr('width', w)
+                   .attr('height', w);
+    
+  
+  var xScale = d3.scale
+                .linear()
+                // It is better to programmatically calculate
+                // the domain values from the data.
+                // But let's do it manually now for simplicity
+                .domain([1988, 2016]) 
+                .range([margin, w-margin]);
+  
+  var yScale = d3.scale
+                .linear()
+                // It is better programmatically calculate
+                // the domain values from the data.
+                // But let's do it manually now for simplicity
+                .domain([0, 20])
+                .range([h-margin, margin]);
+
+  var gen = d3.svg.area()
+                  .x(function(d){ 
+                    return xScale(d['year']); 
+                   })
+                  .y0(function(d){ 
+                    return yScale(d['goals_for']);    
+                   })
+                  .y1(function(d){ 
+                    return yScale(d['goals_against']);    
+                   })
+                  .interpolate('monotone');
+
+
+  svg_area.append("path")
+          .attr("class", "area")
+          .attr("d", gen(germany_cup));
+
+  </script>
+<html> 

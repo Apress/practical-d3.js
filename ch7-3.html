@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <title>NYC Budget</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <style>
+  </style>
+  <body>
+
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+// Budget data (nybudget) source:
+// http://www.nyc.gov/html/omb/downloads/pdf/fp6_15.pdf
+
+var nybudget = { 
+   'name': 'NYC Budget 2015'  , 'children': [
+        {'name': 'Personal Services', 'children': [
+            {'name': 'Salaries and Wages', 'value': 24023},
+            {'name': 'Pensions', 'value': 8621},
+            {'name': 'Fringe Benefits', 'value': 8635},
+            {'name': 'Retiree Health Benefits', 'value': 955},
+          ]
+        },
+        {'name': 'Other Services', 'children': [
+            {'name': 'Medical Assistance', 'value': 6275},
+            {'name': 'Public Assistance', 'value': 1472},
+            {'name': 'All Other ', 'value': 25149},
+          ]
+        },
+        {'name': 'Debt Service', 'value': 5971},
+      ]
+};
+
+
+
+var w= 400, h = 400;
+var margin = 20;
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w+2*margin)
+    .attr('height', h+2*margin);
+
+// You can use preset colors:
+// var colours = d3.scale.category10();
+// But, I'd rather use my own colors this time
+var colours = d3.scale.ordinal().range(["#d9d9d9","#74c476","#6baed6","#9e9ac8"]);
+
+// Using partition layout
+var partition = d3.layout.partition();
+
+// Try changing values for domains
+var radiusScale = d3.scale.linear()
+                    .domain([0, 1])
+                    .range([80, Math.min(w,h)/2]);
+
+var angleScale = d3.scale.linear()
+                   .domain([0, 1])
+                   .range([0.5*Math.PI, 2*Math.PI]);
+
+var arc = d3.svg.arc() 
+            .innerRadius(function(d){ 
+              return radiusScale(d.y); 
+             }) 
+            .outerRadius(function(d){
+              return radiusScale(d.y+d.dy); 
+             })
+            .startAngle(function(d){ 
+              return angleScale(d.x);
+             }) 
+            .endAngle(function(d){ 
+              return angleScale(d.x+d.dx); 
+             });
+
+svg.selectAll("path")
+   .data(partition(nybudget))
+   .enter()
+   .append("path") 
+   .attr("d", arc) 
+   .attr("fill", function(d,i){
+      if (d.depth < 2){
+        return colours(d.name);
+      } else {
+        return colours(d.parent.name);
+      }
+    })
+   .attr("stroke", "#FFFFFF")
+   .attr("stroke-width", "4px")
+   .on("click", function(d,i){
+      console.log(d.name);
+   })
+   .attr("transform", "translate("+(margin+w/2)+","+(margin+h/2)+")");
+
+
+  </script>
+<html> 

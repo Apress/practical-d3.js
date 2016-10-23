@@ -1,0 +1,150 @@
+<html>
+  <head>
+    <title>Music</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+    <h1>Top Tracks by Last.fm</h1>
+    <h3 id='top_label'></h3>
+    <div id='svg_container'></div>
+    <br/>
+    <input type="range" id="slider" style="width: 660;" min="0" max="10" value="10" step="1" onchange="filter(this.value)" />
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+
+var w = 660, h = 450, margin = 80;
+
+var all_tracks = [];
+
+var svg = d3.select('#svg_container')
+            .append('svg')
+            .attr('width', w)
+            .attr('height', h);
+
+// Last.fm API, I altered the key part of it though.
+// You will need to use your own key with the URL.
+//var url = 'http://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=YOUR-LASTFM-KEY&format=json'
+var url = 'https://raw.githubusercontent.com/gr33ndata/d3book/master/ch9/data/lastfm.json'
+
+var colours = d3.scale.category20();
+
+var nodes = null,
+    labels = null;
+
+// Load the JSON file from Last.fm, and draw!
+d3.json(url, function(error, data){
+  var tracks = data.tracks.track;
+  tracks = tracks.sort(function(a,b){
+    var a = parseInt(a.listeners, 10);
+    var b = parseInt(b.listeners, 10);
+    return (a == b)? 0 : ( (a > b)? -1 : 1 );
+  })
+  draw(tracks);
+});
+
+// Change scale according to number of tracks to be shown
+var set_scales = function(tracks){
+  
+  var xDomain = d3.extent(tracks, function(d){ 
+    return parseInt(d.listeners, 10); 
+  });
+  
+  var yDomain = d3.extent(tracks, function(d){ 
+    return parseInt(d.playcount, 10); 
+  });
+
+  return {
+    'xScale': d3.scale.log().base(10) 
+                .domain(xDomain)
+                .range([margin, w-margin]), 
+
+    'yScale': d3.scale.log().base(10) 
+                .domain(yDomain)
+                .range([h-margin, margin])
+  }
+}  
+
+// Draws and set everything at first
+var draw = function(tracks){
+
+  // Define x and y scales,
+  // base on number of tracks we have
+  var scales = set_scales(tracks);
+  var xScale = scales.xScale;
+  var yScale = scales.yScale; 
+
+  nodes = svg.selectAll('node')
+           .data(tracks)
+           .enter()
+           .append('circle')
+           .attr('class', 'node')
+           .attr('cx', function(d,i){ 
+              return xScale(d.listeners);
+            })
+           .attr('cy', function(d,i){ 
+              return yScale(d.playcount);
+            })
+           .attr('r', function(d,i){
+              // Tracks ranked higher get bigger dots 
+              return 25*Math.pow(0.96,i);
+            })
+           .attr("fill", function(d,i){ 
+              return colours(d.artist.name);
+            })
+           .on('mouseover', function(d,i){
+              // Set label to track/atrist names upon hover
+              d3.select('#top_label')
+                .text(' ' + d.name + ' by ' + d.artist.name);
+            })
+           .on('mouseout', function(d,i){
+              // Set label back to number of tracks we have
+              d3.select('#top_label')
+                .text('Listing top ' + tracks.length + ' tracks')
+            });
+
+  all_tracks = tracks;
+
+  // Set labels to number of tracks retrieved.
+  d3.select('#top_label')
+    .text('Listing the top ' + tracks.length + ' tracks');
+
+  // Move slider to show all 50 tracks
+  d3.select('#slider')
+    .attr('max', tracks.length)
+    .attr('value', tracks.length);
+
+}
+
+// Moves dots when slider is changed
+var filter = function(n){
+
+  // We only want top n tracks, 
+  // The value of n is set by the slider.
+  var tracks = all_tracks.slice(0, n);
+  // Define x and y scales accordingly
+  var scales = set_scales(tracks);
+  var xScale = scales.xScale;
+  var yScale = scales.yScale; 
+
+  d3.select('#top_label').text('Listing top ' + tracks.length + ' tracks');
+
+  nodes.transition()
+       .duration(2000)
+       .attr('cx', function(d,i){ 
+          return xScale(d.listeners);
+        })
+       .attr('cy', function(d,i){ 
+          return yScale(d.playcount);
+        })
+       .style("opacity",function(d, i){
+          return (i>n)? 0 : 1;
+        });
+
+}  
+
+  </script>
+<html> 

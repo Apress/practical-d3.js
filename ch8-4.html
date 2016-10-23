@@ -1,0 +1,122 @@
+<html>
+  <head>
+    <title>FIFA World Cup Winners</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+var cup_winners = [
+  {'country': 'Brazil', 'wins': 5, 'continent': 'Americas'},
+  {'country': 'Germany', 'wins': 4, 'continent': 'Europe'},
+  {'country': 'Italy', 'wins': 4, 'continent': 'Europe'},
+  {'country': 'Argentina', 'wins': 2, 'continent': 'Americas'},
+  {'country': 'Uruguay', 'wins': 2, 'continent': 'Americas'},
+  {'country': 'France', 'wins': 1, 'continent': 'Europe'},
+  {'country': 'England', 'wins': 1, 'continent': 'Europe'},
+  {'country': 'Spain', 'wins': 1, 'continent': 'Europe'},
+];
+
+var cup_chart = {
+  mode: 'single',
+  toggle_mode: function(){
+    this.mode = (this.mode == 'single')? 'double' : 'single';
+  },
+  focus: function(continent){
+  if (this.mode == 'double'){
+    return (continent == 'Americas')? {'x': 0.35*w ,'y': 0.5*h} : {'x': 0.65*w ,'y': 0.5*h};
+    } else {
+      return {'x': 0.5*w ,'y': 0.5*h}
+    }  
+  }
+};
+
+var w = 840, h = 520;
+
+var svg = d3.select('body').append('svg')
+    .style("background", "#FFF")
+    .attr('width', w)
+    .attr('height', h);
+
+
+var force = d3.layout.force()
+    .size([w, h])
+    .charge(function(d){
+      return -120*d.wins*d.wins;
+     })
+    .gravity(0);
+
+force.nodes(cup_winners);
+
+
+var node_shape = svg.selectAll('circle')
+      .data(force.nodes())
+      .enter()
+      .append('circle')
+      .attr('r', function(d){
+        return 19*d.wins;
+       })
+      .on('click', function(){
+        cup_chart.toggle_mode();
+        force.start();
+      })
+      .style("fill", function(d,i){ 
+        return (d.continent == 'Americas')? '#ff7f0e' : '#1f77b4';
+       })
+      .style("opacity", 0.55);
+
+var node_text = svg.selectAll('text')
+      .data(force.nodes())
+      .enter()
+      .append('text')
+      .text(function(d){ 
+        return d.country; 
+       })
+      .style("text-anchor", "middle")
+      .attr('font-size', function(d){
+        return 9*d.wins;
+       })
+      .style("fill", function(d,i){ 
+        return (d.continent == 'Americas')? '#1f77b4' : '#ff7f0e';
+       });
+
+
+
+force.on('tick', function(e) {
+
+    var gravity = 0.2;
+    var k = gravity * e.alpha;
+
+    cup_winners.forEach(function(o, i) {
+      o.y += (cup_chart.focus(o.continent).y - o.y) * k;
+      o.x += (cup_chart.focus(o.continent).x - o.x) * k;
+    });
+
+    node_shape.attr('cx', function(d) { 
+            return d.x; 
+         })
+        .attr('cy', function(d) { 
+            return d.y; 
+         });
+
+    node_text.attr('x', function(d) { 
+            return d.x; 
+         })
+        .attr('y', function(d) { 
+            return d.y; 
+         });
+          
+});
+
+
+force.start();
+
+
+
+
+  </script>
+<html> 

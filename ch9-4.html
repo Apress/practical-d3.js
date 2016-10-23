@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <title>Nesting</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+    
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+  <script type="text/javascript">
+
+  var w = 900, h = 450;
+  var odi_url = "http://index.okfn.org/api/places.json";
+  var geo_url = "https://gist.githubusercontent.com/sindresorhus/1341699/raw/84704529d9ee4965df2cddc55e5f2bc3dc686950/countrycode-latlong-array.json";
+
+  var svg = d3.select('body').append('svg')
+              .attr('width', w)
+              .attr('height', h);
+
+  var colours = d3.scale.category10();
+
+  // Longitude goes from -180 to 180
+  var xScale = d3.scale.linear()
+                 .domain([-180, 180]) 
+                 .range([0, w]);
+
+  // Latitude goes from -90 to 90
+  var yScale = d3.scale.linear()
+                 .domain([90, -90]) 
+                 .range([0, h]); 
+
+  // Circles radii are function of score
+  var rScale = d3.scale.linear()
+                 .domain([0, 100]) 
+                 .range([0, 40]);           
+
+
+  queue()
+    .defer(d3.json, odi_url)
+    .defer(d3.json, geo_url)
+    .await(function(error, odi, geo) { 
+      if (error) return console.warn(error); 
+      console.log(odi, geo);
+      draw(odi, geo); 
+    });
+
+var draw = function(odi, geo){
+
+  // Add coordinates to Index data
+  odi.forEach(function(d, i){
+      try {
+        d.lat = geo[d.id][0];
+        d.lng = geo[d.id][1];
+      }
+      catch(err) {
+        d.lat = d.lng = null;
+      }
+  });
+
+  // Ignore countries we could not get coordinates for
+  // Also declutter the drawing by ignoring countries with low score 
+  odi = odi.filter(function(d, i){
+    if (d.lng == null){
+      return false;
+    }
+    if (d.score < 20){
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  // Draw circle for each country
+  svg.selectAll("circle")
+     .data(odi)
+     .enter()
+     .append("circle") 
+     .on('click', function(d, i){
+        console.log("" + d.id + " " + d.score)
+      })
+     .attr("cx", function(d,i){
+        return xScale(d.lng);
+      })
+     .attr("cy", function(d,i){
+        return yScale(d.lat);
+      })
+     .style("r", function(d,i){
+        return rScale(d.score);
+      })
+     .style("fill", function(d,i){
+        return colours(d.continent);
+      })
+     .style("opacity",function(d){
+        return 0.45;
+      });
+
+  svg.selectAll("text")
+     .data(odi)
+     .enter()
+     .append("text") 
+     .text(function(d){ 
+        return d.id.toUpperCase();; 
+      }) 
+     .attr("x", function(d,i){
+        return xScale(d.lng);
+      })
+     .attr("y", function(d,i){
+        return yScale(d.lat);
+      })
+     .style("text-anchor", "middle")
+     .attr('font-family', function(d){
+        return 'Verdana';
+      })
+     .attr('font-weight', function(d){
+        return 'bold';
+      })
+     .style("font-size", function(d,i){
+        return "8px";
+      })
+     .attr("fill", function(d,i){
+        return "#000";
+      })
+     .style("opacity",function(d){
+        return 0.8;
+      });
+
+}  
+
+
+  </script>
+<html> 

@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <title>Mind the Gap</title>
+    <meta name="description" content="Practical D3">
+    <meta name="author" content="Tarek Amr, @gr33ndata">
+  </head>
+  <body>
+  </body>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+/**
+
+The Global Gender Gap Index examines the gap between men and women in four fundamental categories (sub-indexes): Economic Participation and Opportunity, Educational Attainment, Health and Survival and Political Empowerment.
+http://reports.weforum.org/global-gender-gap-report-2014/part-1/the-global-gender-gap-index-2014/
+
+Alice Corona from Silk cleaned the data and put it in machine readable format, i.e. CSV
+https://github.com/ali-ce/datasets/blob/master/Global-Gender-Gap-Index-2014/Country%20Main%20Indices.csv
+https://raw.githubusercontent.com/ali-ce/datasets/master/Global-Gender-Gap-Index-2014/Country%20Main%20Indices.csv
+
+*/
+
+var w = 1200, h = 620, margin = 20;
+
+var svg = d3.select('body').append('svg')
+            .attr('width', w).attr('height', h);
+
+var url = 'https://raw.githubusercontent.com/ali-ce/datasets/master/Global-Gender-Gap-Index-2014/Country%20Main%20Indices.csv'
+
+var colours = d3.scale.category10();
+
+var draw = function(rows){
+  var mode = 0; 
+  var xScale = d3.scale.linear()
+                 .domain([0, 1])
+                 .range([margin, w-margin]); 
+
+  var yScale = d3.scale.ordinal()
+                 .domain(rows.map(function(d,i){ return i; }))
+                 .rangePoints([margin, h-margin]);
+
+  var bars_widths = 0.85 * (h - 2*margin) / rows.length;
+
+  bar = svg.selectAll('bar')
+           .data(rows)
+           .enter()
+           .append('rect')
+           .attr('class', 'bar')
+           .attr('x', function(d,i){ 
+              return xScale(0);
+            })
+           .attr('y', function(d,i){ 
+              return yScale(i);
+            })
+           .attr('width', function(d,i){ 
+              return xScale(d.score) - xScale(0);
+            })
+           .attr('height', function(d,i){ 
+              return bars_widths; 
+            })
+           .attr("fill", function(d,i){ 
+              return colours(d.region);
+            });
+  
+  lable = svg.selectAll('lable')
+           .data(rows)
+           .enter()
+           .append('text')
+           .attr('class', 'lable')
+           .attr('x', function(d,i){ 
+              return xScale(d.score) + 20;
+            })
+           .attr('y', function(d,i){ 
+              return yScale(i) + 10;
+            })
+           .text(function(d){ return d.country; })
+           .style("text-anchor", "begin")
+           .attr('font-size', function(d){
+              return 1.4*bars_widths;
+            })
+           .attr("fill", function(d,i){ 
+              return colours(d.region);
+            });
+
+  
+  bar.on('click',function(){
+    mode = (mode == 0)? 1 : 0;
+    
+    bar.sort(function(a,b){
+      if (mode == 0){
+        return (a.score == b.score)? 0 : ((a.score > b.score)? 1 : -1);
+      } else {
+        return (a.score == b.score)? 0 : ((a.score > b.score)? -1 : 1);
+      }  
+    })
+    .transition()
+    .duration(function(d,i){ return 80 * i;  })
+    /**.attr('x', function(d,i){ 
+      return xScale(0);
+    })*/
+   .attr('y', function(d,i){ 
+      return yScale(i);
+    });
+
+    lable.sort(function(a,b){
+      if (mode == 0){
+        return (a.score == b.score)? 0 : ((a.score > b.score)? 1 : -1);
+      } else {
+        return (a.score == b.score)? 0 : ((a.score > b.score)? -1 : 1);
+      }  
+    })
+    .transition()
+    .duration(function(d,i){ return 50 * i; })
+    /**.attr('x', function(d,i){ 
+      return xScale(d.score) + 20;
+    })*/
+   .attr('y', function(d,i){ 
+      return yScale(i) + 10;
+    });
+
+  }); 
+   
+
+}
+
+d3.csv(url, function(d){
+  return {
+    country: d['Country'],
+    // We convert income group from '1 (High Income)' to 1
+    income: d['Income Group'].split(' ')[0],
+    region: d['Region'],
+    score: d['Overall - Score'],
+  };
+}, function(error, rows) {
+  // Let's only plot high income countris.
+  if (error){
+    console.log(error.responseText);
+    return;
+  }
+  draw(
+    rows.filter(function(d,i){ 
+      return (d.income == '1'); 
+    }).sort(function(a,b){
+      return (a.score == b.score)? 0 : ((a.score > b.score)? -1 : 1);
+    })
+  );
+});
+
+
+
+  </script>
+<html> 
+
